@@ -7,6 +7,7 @@ contract TimeCapsules {
   struct Content {
     string text;
     uint uploadTime;
+    bool state;
   }
 
   mapping(address => Content) timeCapsule;
@@ -20,13 +21,17 @@ contract TimeCapsules {
     _;
   }
 
-  function setText(string memory _text) public onlyOwner {
-    Content memory content = Content(_text,block.timestamp);
+  function setText(string memory _text) public onlyOwner returns(bool){
+    Content memory content = Content(_text,block.timestamp,true);
     timeCapsule[msg.sender] = content;
+    return true;
   }
 
   function readText() view public onlyOwner returns(string memory) {
-    require(block.timestamp >= (timeCapsule[msg.sender].uploadTime + 1 minutes));
-    return timeCapsule[msg.sender].text;
+    if(block.timestamp >= (timeCapsule[msg.sender].uploadTime + 1 minutes)){
+      return timeCapsule[msg.sender].text;
+    }else{
+      return "";
+    }
   }
 }
