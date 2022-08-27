@@ -15,8 +15,8 @@ function Contract({ value }) {
 
   return (
     <code>
-      {`contract SimpleStorage {
-  uint256 value = `}
+      {`contract TimeCapsules {
+  string value = `}
 
       <span className="secondary-color" ref={spanEle}>
         <strong>{value}</strong>
@@ -24,11 +24,11 @@ function Contract({ value }) {
 
       {`;
 
-  function read() public view returns (uint256) {
+  function readText() public view returns (string) {
     return value;
   }
 
-  function write(uint256 newValue) public {
+  function setText(string inputValue) public {
     value = newValue;
   }
 }`}
