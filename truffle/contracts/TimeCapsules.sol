@@ -47,7 +47,11 @@ contract TimeCapsules {
     return int(result);
   }
 
-  function createCapsule(string memory _content, int256 _x, int256 _y, int256 _z, uint _canOpen) public returns(uint) {
+  function getPositionLength() view public returns(uint){
+    return positions.length;
+  }
+
+  function createCapsule(string memory _content, int256 _x, int256 _y, int256 _z, uint _canOpen) public {
     require(isCreated[msg.sender] == false,"already created");
     Position memory pos = Position(_x,_y,_z,msg.sender,false);
     positions.push(pos);
@@ -57,8 +61,6 @@ contract TimeCapsules {
 
     // Capsule数を増やす
     isCreated[msg.sender] = true;
-
-    return id;
   }
 
   function deleteCapsule(uint _id) public onlyMine(_id) {
