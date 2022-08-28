@@ -10,16 +10,17 @@ const World = () => {
         setInputValue(e.target.value);
       };
     const readText = async () => {
-        const value = await contract.methods.readText().call({ from: accounts[0] });
-        if (value === "") {
-          alert("まだ開けることは出来ません．");
-          return;
-        }else{
-            setMessage(value);
-          
-          console.log(message)
+        const index = await contract.methods.getCapsule().call({ from: accounts[0] });
+        console.log(index)
+    
+        const value = await contract.methods.timeCapsules(index).call({ from: accounts[0] });
 
-        }
+        const t = await contract.methods.deleteCapsule(index).call({ from: accounts[0] });
+
+          console.log(value)
+          console.log(t)
+
+        
       };
       const setText = async e => {
         if (e.target.tagName === "INPUT") {
@@ -29,8 +30,9 @@ const World = () => {
           alert("Please enter a value to write.");
           return;
         }
-        const contractObject = await contract.methods.setText_1m(inputValue,{x:0,y:0,z:0}).send({ from: accounts[0] });
+        const contractObject = await contract.methods.createCapsule("test",0,-1,3,0).send({ from: accounts[0] });
         console.log(contractObject)
+        
 
       };
     return (
@@ -49,7 +51,6 @@ const World = () => {
         setText(<input
           type="text"
           placeholder="string"
-          value={inputValue}
           onChange={handleInputChange}
         />)
       </button>
