@@ -25,13 +25,13 @@ contract TimeCapsules {
   mapping(address => bool) isCreated;
 
   modifier onlyMine(uint id){
-    require(capsuleToOwner[id] == msg.sender);
+    require(capsuleToOwner[id] == msg.sender,"onlyMine!!");
     _;
   }
 
   function getCapsule() external view returns(int){
     //0の時は空配列を返す
-    if(isCreated[msg.sender] == true){
+    if(isCreated[msg.sender] == false){
       return -1;
     }
     uint result;
@@ -48,7 +48,7 @@ contract TimeCapsules {
   }
 
   function createCapsule(string memory _content, int256 _x, int256 _y, int256 _z, uint _canOpen) public returns(uint) {
-    require(isCreated[msg.sender] == false);
+    require(isCreated[msg.sender] == false,"already created");
     Position memory pos = Position(_x,_y,_z,msg.sender,false);
     positions.push(pos);
     timeCapsules.push(TimeCapsule(_content, false, _canOpen, pos));
@@ -62,12 +62,11 @@ contract TimeCapsules {
   }
 
   function deleteCapsule(uint _id) public onlyMine(_id) {
-    require(timeCapsules[_id].is_deleted == false);
-    //指定されたインデックスの真偽値をtrueにする
+    require(timeCapsules[_id].is_deleted == false, "this id's capsule already deleted");
+    //指定のidのカプセルは開封済みとする
     positions[_id].is_opened = true;
-    // 自分のCapsuleを削除する
+    // 指定のidのCapsuleを削除する
     timeCapsules[_id].is_deleted = true;
-
     // Capsule数を減らす
     isCreated[msg.sender] = false;
   }
