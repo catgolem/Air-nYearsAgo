@@ -16,7 +16,7 @@ const World = () => {
           return;
         }else{
             setMessage(value);
-          localStorage.setItem("adress:",accounts)
+          
           console.log(message)
 
         }
@@ -29,7 +29,7 @@ const World = () => {
           alert("Please enter a value to write.");
           return;
         }
-        const contractObject = await contract.methods.setText(inputValue).send({ from: accounts[0] });
+        const contractObject = await contract.methods.setText_1m(inputValue,{x:0,y:0,z:0}).send({ from: accounts[0] });
         console.log(contractObject)
 
       };

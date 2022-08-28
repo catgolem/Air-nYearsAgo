@@ -5,14 +5,35 @@ import {
   Link,
 } from "react-router-dom";
 import World from "./World"
-import Web3 from "web3";
 import { useState } from "react";
 import useEth from "../contexts/EthContext/useEth";
+import { useEffect } from "react";
 
 
 const Home = () => {
   const { state: { contract, accounts } } = useEth();
   const [inputValue, setInputValue] = useState("");
+  // useEffect(()=>{
+  //   localStorage.setItem("adress:",accounts)
+  //   const getData = async () => {
+  //     console.log(contract)
+  //     const getObj = await contract.methods.readText().call({ from: accounts[0] });
+  //   }
+  //   try{
+  //     getData()
+  //   }catch(err){
+  //     console.error(err)
+  //   }
+    
+    
+  // },[contract])
+  const Init =async () => {
+    localStorage.setItem("adress:",accounts)
+      console.log(contract)
+      const getObj = await contract.methods.readText().call({ from: accounts[0] });
+      localStorage.setItem("TimeCapsules",JSON.stringify(getObj))
+      console.log(getObj)
+  }
 
 
     return (
@@ -24,6 +45,7 @@ const Home = () => {
                 <div>
                   タイトル
                 </div>
+                <button onClick={()=>Init()}>test</button>
                 <nav>
                   <Link to="/world">ENETR!!</Link>
                 </nav>
