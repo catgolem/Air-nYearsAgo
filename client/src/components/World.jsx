@@ -30,7 +30,7 @@ const World = () => {
           alert("Please enter a value to write.");
           return;
         }
-        const contractObject = await contract.methods.createCapsule("test",0,-1,3,0).send({ from: accounts[0] });
+        const contractObject = await contract.methods.createCapsule("test",0,-1,3,0).send({ from: accounts[0],gas:100000000 });
         console.log(contractObject)
         
 
