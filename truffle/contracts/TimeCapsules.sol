@@ -7,60 +7,68 @@ contract TimeCapsules {
     int256 x;
     int256 y;
     int256 z;
+    address user;
+    bool is_opened;
   }
 
   struct TimeCapsule {
-    address user;
     string text;
-    uint uploadTime;
-    uint timeLimit;
+    bool is_deleted;
+    uint canOpenTime;
     Position position;
   }
+  
+  Position[] public positions;
+  TimeCapsule[] public timeCapsules;
 
-  TimeCapsule[] timeCapsules;
+  mapping(uint => address) public capsuleToOwner;
+  mapping(address => bool) isCreated;
 
-  // constructor() {
-  //   available[msg.sender] = true;
-  // }
-
-  // modifier onlyOwner {
-  //   require(msg.sender == owner);
-  //   _;
-  // }
-
-  //event Notice(address indexed from, bool isCreated);
-
-  function setText_1m(string memory _text, Position memory _pos) public {
-    Position memory pos = Position(_pos.x, _pos.y, _pos.z);
-    TimeCapsule memory content = TimeCapsule(msg.sender,_text,block.timestamp,1 minutes,pos);
-    timeCapsules.push(content);
+  modifier onlyMine(uint id){
+    require(capsuleToOwner[id] == msg.sender);
+    _;
   }
 
-  function setText_1h(string memory _text, Position memory _pos) public {
-    Position memory pos = Position(_pos.x, _pos.y, _pos.z);
-    TimeCapsule memory content = TimeCapsule(msg.sender,_text,block.timestamp,1 hours,pos);
-    timeCapsules.push(content);
+  function getCapsule() external view returns(int){
+    //0の時は空配列を返す
+    if(isCreated[msg.sender] == true){
+      return -1;
+    }
+    uint result;
+    for (uint i = 0; i < timeCapsules.length; i++) {
+      if (capsuleToOwner[i] == msg.sender && timeCapsules[i].is_deleted == false) {
+        if(block.timestamp >= (timeCapsules[i].canOpenTime)){
+          result = i;
+        }else{
+          return -2;
+        }
+      }
+    }
+    return int(result);
   }
 
-  function setText_1d(string memory _text, Position memory _pos) public {
-    Position memory pos = Position(_pos.x, _pos.y, _pos.z);
-    TimeCapsule memory content = TimeCapsule(msg.sender,_text,block.timestamp,1 days,pos);
-    timeCapsules.push(content);
+  function createCapsule(string memory _content, int256 _x, int256 _y, int256 _z, uint _canOpen) public returns(uint) {
+    require(isCreated[msg.sender] == false);
+    Position memory pos = Position(_x,_y,_z,msg.sender,false);
+    positions.push(pos);
+    timeCapsules.push(TimeCapsule(_content, false, _canOpen, pos));
+    uint id = timeCapsules.length - 1;
+    capsuleToOwner[id] = msg.sender;
+
+    // Capsule数を増やす
+    isCreated[msg.sender] = true;
+
+    return id;
   }
 
-  function setText_1w(string memory _text, Position memory _pos) public {
-    Position memory pos = Position(_pos.x, _pos.y, _pos.z);
-    TimeCapsule memory content = TimeCapsule(msg.sender,_text,block.timestamp,1 weeks,pos);
-    timeCapsules.push(content);
-  }
+  function deleteCapsule(uint _id) public onlyMine(_id) {
+    require(timeCapsules[_id].is_deleted == false);
+    //指定されたインデックスの真偽値をtrueにする
+    positions[_id].is_opened = true;
+    // 自分のCapsuleを削除する
+    timeCapsules[_id].is_deleted = true;
 
-  function setText_1Y(string memory _text, Position memory _pos) public {
-    Position memory pos = Position(_pos.x, _pos.y, _pos.z);
-    TimeCapsule memory content = TimeCapsule(msg.sender,_text,block.timestamp,365 days,pos);
-    timeCapsules.push(content);
-  }
-
-  function readText() view public returns(TimeCapsule[] memory) {
-    return timeCapsules;
+    // Capsule数を減らす
+    isCreated[msg.sender] = false;
   }
 }
