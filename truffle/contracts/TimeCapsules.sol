@@ -2,36 +2,65 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 contract TimeCapsules {
-  address private owner;
-  
-  struct Content {
+
+  struct Position {
+    int256 x;
+    int256 y;
+    int256 z;
+  }
+
+  struct TimeCapsule {
+    address user;
     string text;
     uint uploadTime;
-    bool state;
+    uint timeLimit;
+    Position position;
   }
 
-  mapping(address => Content) timeCapsule;
+  TimeCapsule[] timeCapsules;
 
-  constructor() {
-    owner = msg.sender;
+  // constructor() {
+  //   available[msg.sender] = true;
+  // }
+
+  // modifier onlyOwner {
+  //   require(msg.sender == owner);
+  //   _;
+  // }
+
+  //event Notice(address indexed from, bool isCreated);
+
+  function setText_1m(string memory _text, Position memory _pos) public {
+    Position memory pos = Position(_pos.x, _pos.y, _pos.z);
+    TimeCapsule memory content = TimeCapsule(msg.sender,_text,block.timestamp,1 minutes,pos);
+    timeCapsules.push(content);
   }
 
-  modifier onlyOwner {
-    require(msg.sender == owner);
-    _;
+  function setText_1h(string memory _text, Position memory _pos) public {
+    Position memory pos = Position(_pos.x, _pos.y, _pos.z);
+    TimeCapsule memory content = TimeCapsule(msg.sender,_text,block.timestamp,1 hours,pos);
+    timeCapsules.push(content);
   }
 
-  function setText(string memory _text) public onlyOwner returns(bool){
-    Content memory content = Content(_text,block.timestamp,true);
-    timeCapsule[msg.sender] = content;
-    return true;
+  function setText_1d(string memory _text, Position memory _pos) public {
+    Position memory pos = Position(_pos.x, _pos.y, _pos.z);
+    TimeCapsule memory content = TimeCapsule(msg.sender,_text,block.timestamp,1 days,pos);
+    timeCapsules.push(content);
   }
 
-  function readText() view public onlyOwner returns(string memory) {
-    if(block.timestamp >= (timeCapsule[msg.sender].uploadTime + 1 minutes)){
-      return timeCapsule[msg.sender].text;
-    }else{
-      return "";
-    }
+  function setText_1w(string memory _text, Position memory _pos) public {
+    Position memory pos = Position(_pos.x, _pos.y, _pos.z);
+    TimeCapsule memory content = TimeCapsule(msg.sender,_text,block.timestamp,1 weeks,pos);
+    timeCapsules.push(content);
+  }
+
+  function setText_1Y(string memory _text, Position memory _pos) public {
+    Position memory pos = Position(_pos.x, _pos.y, _pos.z);
+    TimeCapsule memory content = TimeCapsule(msg.sender,_text,block.timestamp,365 days,pos);
+    timeCapsules.push(content);
+  }
+
+  function readText() view public returns(TimeCapsule[] memory) {
+    return timeCapsules;
   }
 }
