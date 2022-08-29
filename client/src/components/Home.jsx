@@ -2,104 +2,43 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Link,
 } from "react-router-dom";
 import World from "./World"
-import { useState ,useEffect} from "react";
 import useEth from "../contexts/EthContext/useEth";
-import { Canvas, useThree, useLoader ,useFrame} from "@react-three/fiber"
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
-import {TextGeometry} from "three/examples/jsm/geometries/TextGeometry";
+import { Canvas } from "@react-three/fiber"
 import * as THREE from "three"
+import * as Drei from "@react-three/drei"
+import colors from "nice-color-palettes"
 import Font from "./assets/text.typeface.json"
 
-const CameraController = () => {
-  const {camera, gl} = useThree()
-  useEffect(() => {
-    const controls = new OrbitControls(camera,gl.domElement)
-    controls.minDistance = 1
-    controls.maxDistance = 10
-    return () => {
-      controls.dispose()
-    }
-  },[camera,gl])
-
-  return null
-}
-
-function Text3d() {
-  const font = new FontLoader().parse(Font);
-  const textgeometry = new TextGeometry("Hello World!!",{
-    font: font,
-    size: 1,
-    height: 1,
-    curveSegments: 5,
-    bevelEnabled: true,
-    bevelThickness: 0.03,
-    bevelSize: 0.02,
-    bevelOffset: 0,
-    bevelSegments: 4,
-  })
-  textgeometry.center()
-  const material = new THREE.MeshNormalMaterial();
-  return (
-    <mesh
-      geometry={textgeometry}
-      material={material} 
-    />
-  )
-}
-
 function Box() {
-  const boxgeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5)
-  const material = new THREE.MeshNormalMaterial()
+  const boxgeometry = new THREE.SphereGeometry(0.5)
+  const material = new THREE.MeshBasicMaterial({color: colors[Math.floor(Math.random()*100)][Math.floor(Math.random()*5)]})
+  boxgeometry.center()
   function createRandomPos() {
-    return (Math.random() - 0.4) * 10
+    return (Math.random() - 0.5) * 35
   }
   return (
-    <mesh
-      geometry={boxgeometry}
-      material={material}
-      position={[createRandomPos(),createRandomPos(),createRandomPos()]}
-      rotateX={Math.random() * Math.PI}
-      rotateY={Math.random() * Math.PI}
-    />
+    <Drei.Float
+      speed={1} // Animation speed, defaults to 1
+      rotationIntensity={1} // XYZ rotation intensity, defaults to 1
+      floatIntensity={1} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+      floatingRange={[1, 10]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+    >
+      <mesh
+        geometry={boxgeometry}
+        material={material}
+        position={[createRandomPos(), createRandomPos(), createRandomPos()]}
+      />
+    </Drei.Float>
   )
 }
 
-// function SurperBox() {
-//   const boxgeometry = new THREE.BoxGeometry(3, 1, 1)
-//   const material = new THREE.MeshNormalMaterial()
-//   boxgeometry.center()
-//   return (
-//     <mesh
-//       geometry={boxgeometry}
-//       material={material}
-//       position={[0,-2,0]}
-//     />
-//   )
-// }
 
 const Home = () => {
   const { state: { contract, accounts } } = useEth();
-  const [inputValue, setInputValue] = useState("");
-  const arr = Array(50).fill(1)
-  useEffect(()=>{
-    localStorage.setItem("adress:",accounts)
-    const getData = async () => {
-      console.log(contract)
-      const getObj = await contract.methods.readText().call({ from: accounts[0] });
-    }
-    try{
-      getData()
-    }catch(err){
-      console.error(err)
-    }
-    
-    
-  },[contract])
-  const Init =async () => {
+  const arr = Array(200).fill(1)
+  const Init = async () => {
     localStorage.setItem("adress:",accounts)
       console.log(contract)
       const getObj = await contract.methods.readText().call({ from: accounts[0] });
@@ -110,30 +49,45 @@ const Home = () => {
 
     return (
       <div style={{width: `100%` , height: `100%`}}>
-        <Canvas 
-          style={{ width: `100%` ,height : `100%`, background: `black`}}
-        >
-          <CameraController />
-          <ambientLight />
-          <Text3d />
-          {
-            arr.map((e,index) => {
-              return <Box key={index}/>
-            })
-          }
-        </Canvas>
         <BrowserRouter>
           <Routes>
             <Route exact path="/" element={
-              <>
-                <div>
-                  タイトル
-                </div>
-                <button onClick={()=>Init()}>test</button>
-                <nav>
-                  <Link to="/world">ENETR!!</Link>
-                </nav>
-              </>}>
+              <Canvas
+                style={{ width: `100%`, height: `100%`, background: `#F2F3F5` }}
+              >
+                <Drei.PerspectiveCamera makeDefault position={[0,0,15]}/>
+                <ambientLight />
+                <Drei.Float floatIntensity={6} speed={3}>
+                  <Drei.Text3D
+                    font={Font}
+                    bevelEnabled
+                    bevelSize={0.1}
+                    size={2}
+                    position={[-8,0,0]}
+                  >
+                    TimeCapsule
+                    <meshNormalMaterial />
+                  </Drei.Text3D>
+                </Drei.Float>
+                <Drei.Text3D
+                  font={Font}
+                  bevelEnabled
+                  bevelSize={0.05}
+                  size={1.4}
+                  position={[-4,-3.5,0]}
+                  onClick={() => {window.location = "/world"}}
+                >
+                  To World
+                  <meshBasicMaterial color={"#494646"}/>
+                </Drei.Text3D>
+                {
+                  arr.map((e, index) => {
+                    return <Box key={index} />
+                  })
+                }
+                <Drei.OrbitControls />
+              </Canvas>
+            }>
             </Route>
             <Route exact path="/world" element={
               <World/>
