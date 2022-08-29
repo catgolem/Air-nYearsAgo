@@ -38,13 +38,30 @@ function Box() {
 const Home = () => {
   const { state: { contract, accounts } } = useEth();
   const arr = Array(200).fill(1)
-  const Init = async () => {
-    localStorage.setItem("adress:",accounts)
-      console.log(contract)
-      const getObj = await contract.methods.readText().call({ from: accounts[0] });
-      localStorage.setItem("TimeCapsules",JSON.stringify(getObj))
-      console.log(getObj)
-  }
+
+      // データ保存用の関数
+      const Init = async () => {
+        localStorage.setItem("adress",accounts[0])
+        const limit = await contract.methods.getPositionLength().call({ from: accounts[0] });
+        console.log(limit)
+        const timeCapsules=[];
+        const opendCapsules = [];
+        const closedCapsules = []
+        for(var i = 0; i < limit; i++){
+            timeCapsules.push(await contract.methods.positions(i).call({ from: accounts[0] }))
+            if(!timeCapsules[i].is_opened){
+                opendCapsules.push(timeCapsules[i])
+                if(timeCapsules[i].user == accounts){
+                    localStorage.setItem("MyTimeCapsule!!",JSON.stringify(timeCapsules[i]))
+                    console.log("OK")
+                }
+            }else{
+                closedCapsules.push(timeCapsules)
+            }
+        }
+        localStorage.setItem("opendCapsules",JSON.stringify(opendCapsules))
+        localStorage.setItem("timeCapsules",JSON.stringify(timeCapsules))
+    }
 
 
     return (
