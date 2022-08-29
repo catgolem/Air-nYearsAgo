@@ -13,7 +13,7 @@ import Font from "./assets/text.typeface.json"
 
 function Box() {
   const boxgeometry = new THREE.SphereGeometry(0.5)
-  const material = new THREE.MeshBasicMaterial({color: colors[Math.floor(Math.random()*100)][Math.floor(Math.random()*5)]})
+  const material = new THREE.MeshBasicMaterial({ color: colors[Math.floor(Math.random() * 100)][Math.floor(Math.random()*5)]})
   boxgeometry.center()
   function createRandomPos() {
     return (Math.random() - 0.5) * 35
@@ -55,7 +55,7 @@ const Home = () => {
               <Canvas
                 style={{ width: `100%`, height: `100%`, background: `#F2F3F5` }}
               >
-                <Drei.PerspectiveCamera makeDefault position={[0,0,15]}/>
+                <Drei.PerspectiveCamera makeDefault position={[0,0,16]}/>
                 <ambientLight />
                 <Drei.Float floatIntensity={6} speed={3}>
                   <Drei.Text3D
@@ -69,23 +69,35 @@ const Home = () => {
                     <meshNormalMaterial />
                   </Drei.Text3D>
                 </Drei.Float>
-                <Drei.Text3D
-                  font={Font}
-                  bevelEnabled
-                  bevelSize={0.05}
-                  size={1.4}
-                  position={[-4,-3.5,0]}
+                <Drei.Float floatIntensity={10} speed={2}>
+                  <Drei.Text3D
+                    font={Font}
+                    bevelEnabled
+                    bevelSize={0.07}
+                    size={1.4}
+                    position={[-4, -3.5, 0]}
+                    onClick={() => { window.location = "/world" }}
+                  >
+                    To World
+                    <meshBasicMaterial color={"#494646"} />
+                  </Drei.Text3D>
+                </Drei.Float>
+                <Drei.Box 
+                  position={[0,-3,0.5]} 
+                  args={[10,3,2]}
                   onClick={() => {window.location = "/world"}}
                 >
-                  To World
-                  <meshBasicMaterial color={"#494646"}/>
-                </Drei.Text3D>
+                  <meshBasicMaterial color={"#ffffff00"} visible={false}/>
+                </Drei.Box>
                 {
                   arr.map((e, index) => {
                     return <Box key={index} />
                   })
                 }
-                <Drei.OrbitControls />
+                <Drei.OrbitControls
+                  maxDistance={25} 
+                  minDistance={10}
+                />
               </Canvas>
             }>
             </Route>
