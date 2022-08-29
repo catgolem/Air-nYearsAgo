@@ -15,11 +15,16 @@ const World = () => {
     
         const value = await contract.methods.timeCapsules(index).call({ from: accounts[0] });
 
-        const t = await contract.methods.deleteCapsule(index).call({ from: accounts[0] });
-
+        
+        const limit = await contract.methods.getPositionLength().call({ from: accounts[0] });
+        const timeCapsules=[];
+        for(var i = 0; i < limit; i++){
+            timeCapsules.push(await contract.methods.positions(i).call({ from: accounts[0] }))
+        }
+        const t = await contract.methods.deleteCapsule(index).send({ from: accounts[0] });
           console.log(value)
-          console.log(t)
-
+          //console.log(t)
+        console.log(timeCapsules)
         
       };
       const setText = async e => {
@@ -30,7 +35,7 @@ const World = () => {
           alert("Please enter a value to write.");
           return;
         }
-        const contractObject = await contract.methods.createCapsule("test",0,-1,3,0).send({ from: accounts[0],gas:100000000 });
+        const contractObject = await contract.methods.createCapsule("testhhhhhhhhgghghhhgghghghggghghghggghghghghgghhghghgghhghghghghghghggghgghghgghghgghghghghghghghghgggghghghghghghgggghgghggghghghghghghghgghghghghghghghghghghghghghghghghghghghghghggfggdmgdmgdmhdgdmthmhtfyfgyj,gkugu,juugufy,fuujffffyffkyfufyuryuhjyjfyhfmyrkyhffyfyfygtuyfyguyfyjfghjfghyfkyfuyfyfhghffgfhfhkjgjyfyffjkfyfyhfjfgykjgfkyfyfyfhjfhjgfhfyfytdtdftdthdghdghdhgdhdhdthddghdghdhdhhtmhgfhgghhgfgfdgfhgdhdhgdgfdghddghdfhgfhfhgfhfjhfjuguygyugyjgyfyfyffyrfyryyfyfyfyfyfuifuiyfuyfuyguguguアイウエオアイウエオアイウエオアイウエオアイウエオアイウエオアイウエオ本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒本末転倒",0,1,3,0).send({ from: accounts[0],gas:10000000 });
         console.log(contractObject)
         
 
