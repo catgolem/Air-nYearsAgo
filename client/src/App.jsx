@@ -10,7 +10,7 @@ import "./App.css";
 
 function App() {
   return (
-    // <EthProvider>
+    <EthProvider>
       
       <div id="App">
           <Home />
@@ -28,7 +28,7 @@ function App() {
         </div> */}
       
       </div>
-    // </EthProvider>
+    </EthProvider>
   );
 }
 
