@@ -4,13 +4,15 @@ import React, {
   useImperativeHandle,
   forwardRef,
   useMemo,
+  Suspense, 
 } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useLoader } from "@react-three/fiber";
 import { useBox } from "@react-three/cannon";
-import { PointerLockControls } from "@react-three/drei";
+import { PointerLockControls,useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import niceColors from "nice-color-palettes";
 import { CircleBufferGeometry } from "three";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 const Puttingobj = (props) => {
   const tempColor = new THREE.Color();
@@ -27,30 +29,16 @@ const Puttingobj = (props) => {
   const isLocked = useRef(false);
   const [canMove, setcanMove] = useState(false);
   const [isSetObj, setObj] = useState(false);
-  const [boxposition, setpos] = useState(new THREE.Vector3(0, 0, 0));
-  const [circleposition, setposcircle] = useState(new THREE.Vector3(0, 0, 0));
-  const colorArray = useMemo(
-    () =>
-      Float32Array.from(
-        new Array(1000)
-          .fill()
-          .flatMap((_, i) => tempColor.set(data[i].color).toArray())
-      ),
-    []
+  const [boxposition, setpos] = useState(new THREE.Vector3(0, -500, 0));
+  const [circleposition, setposcircle] = useState(
+    new THREE.Vector3(0, -500, 0)
   );
-  const sphreradius = Math.floor(Math.random() * 3 + 1);
-
-  console.log(controlsRef);
-  console.log("ボックス");
-  console.log(capcelref);
 
   useFrame(() => {
     controlsRef.current.addEventListener("lock", () => {
-      console.log("lock");
       setcanMove(true);
     });
     controlsRef.current.addEventListener("unlock", () => {
-      console.log("unlock");
       setcanMove(false);
     });
 
@@ -58,7 +46,6 @@ const Puttingobj = (props) => {
       var forward = new THREE.Vector4(0, 0, 1, 0);
       forward.applyMatrix4(controlsRef.current.camera.matrix).normalize();
       forward.multiplyScalar(6);
-      console.log(forward);
       setposcircle(
         new THREE.Vector3(
           controlsRef.current.camera.position.x + forward.x * -1,
@@ -66,9 +53,15 @@ const Puttingobj = (props) => {
           controlsRef.current.camera.position.z + forward.z * -1
         )
       );
-      circleref.current.position.x = circleposition.x;
-      circleref.current.position.y = circleposition.y;
-      circleref.current.position.z = circleposition.z;
+      if(!isSetObj){
+        circleref.current.position.x = circleposition.x;
+        circleref.current.position.y = circleposition.y;
+        circleref.current.position.z = circleposition.z;
+      } else {
+        circleref.current.position.x = circleposition.x;
+        circleref.current.position.y = -500;
+        circleref.current.position.z = circleposition.z;
+      }
     }
 
     if (isSetObj) {
@@ -108,16 +101,11 @@ const Puttingobj = (props) => {
     );
   }
   const clickPosition = function () {
-    console.log(canMove);
     if (canMove) {
-      //カメラのポジションを取得
-      console.log(controlsRef.current.camera.position);
-
       //前方を取得
       var forward = new THREE.Vector4(0, 0, 1, 0);
       forward.applyMatrix4(controlsRef.current.camera.matrix).normalize();
       forward.multiplyScalar(6);
-      console.log(forward);
       if (!isSetObj) {
         setpos(
           new THREE.Vector3(
@@ -127,19 +115,30 @@ const Puttingobj = (props) => {
           )
         );
       }
-      console.log(isSetObj);
-      // boxref.current.position = boxposition;
-      console.log("test");
-      console.log(capcelref.current.position);
-      //physics.appendChild(<Cube color="red"/>)
     }
   };
 
   document.addEventListener("mousedown", clickPosition, false);
 
+  const LoadModel = () => {
+    const gltf = useLoader(
+      GLTFLoader,
+      "/uploads_files_3450222_Stojak+z+balonami.glb"
+    );
+    return <primitive object={gltf.scene} dispose={null} />;
+  };
+
+  const UseModel = () => {
+    return (
+      <Suspense fallback={null}>
+        <LoadModel />
+      </Suspense>
+    );
+  };
+
   return (
     <>
-      <mesh receiveShadow castShadow ref={capcelref}>
+      {/* <mesh receiveShadow castShadow ref={capcelref} position={[0, -500, 0]}>
         <sphereGeometry args={[1, 32, 32]}>
           <instancedBufferAttribute
             attach="attributes-color"
@@ -147,6 +146,10 @@ const Puttingobj = (props) => {
           />
         </sphereGeometry>
         <meshStandardMaterial roughness={0} toneMapped={false} vertexColors />
+        <pointLight color={"skyblue"} intensity={1} />
+      </mesh> */}
+      <mesh ref={capcelref} position={[0, -500, 0]} scale={[3,3,3]}>
+        <UseModel/>
         <pointLight color={"skyblue"} intensity={1} />
       </mesh>
       <mesh
@@ -161,11 +164,9 @@ const Puttingobj = (props) => {
         onUpdate={() => {
           if (controlsRef.current) {
             controlsRef.current.addEventListener("lock", () => {
-              console.log("lock");
               isLocked.current = true;
             });
             controlsRef.current.addEventListener("unlock", () => {
-              console.log("unlock");
               isLocked.current = false;
             });
           }
