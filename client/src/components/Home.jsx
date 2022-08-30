@@ -4,6 +4,7 @@ import {
   Route,
 } from "react-router-dom";
 import World from "./World"
+import Title from "./Title";
 import useEth from "../contexts/EthContext/useEth";
 import { Canvas } from "@react-three/fiber"
 import * as THREE from "three"
@@ -16,7 +17,7 @@ function Box() {
   const material = new THREE.MeshBasicMaterial({ color: colors[Math.floor(Math.random() * 100)][Math.floor(Math.random()*5)]})
   boxgeometry.center()
   function createRandomPos() {
-    return (Math.random() - 0.5) * 35
+    return (Math.random() - 0.5) * 40
   }
   return (
     <Drei.Float
@@ -51,7 +52,7 @@ const Home = () => {
             timeCapsules.push(await contract.methods.positions(i).call({ from: accounts[0] }))
             if(!timeCapsules[i].is_opened){
                 opendCapsules.push(timeCapsules[i])
-                if(timeCapsules[i].user == accounts){
+                if(timeCapsules[i].user === String(accounts[0]) ){
                     localStorage.setItem("MyTimeCapsule!!",JSON.stringify(timeCapsules[i]))
                     console.log("OK")
                 }
@@ -74,7 +75,8 @@ const Home = () => {
               >
                 <Drei.PerspectiveCamera makeDefault position={[0,0,16]}/>
                 <ambientLight />
-                <Drei.Float floatIntensity={6} speed={3}>
+                <Title/>
+                {/* <Drei.Float floatIntensity={6} speed={3}>
                   <Drei.Text3D
                     font={Font}
                     bevelEnabled
@@ -98,7 +100,7 @@ const Home = () => {
                     To World
                     <meshBasicMaterial color={"#494646"} />
                   </Drei.Text3D>
-                </Drei.Float>
+                </Drei.Float> */}
                 <Drei.Box 
                   position={[0,-3,0.5]} 
                   args={[10,3,2]}
