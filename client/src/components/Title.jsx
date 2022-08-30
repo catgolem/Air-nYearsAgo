@@ -34,7 +34,7 @@ const Title = () => {
           bevelSize={0.07}
           size={1.4}
           position={[-4, -3.5, 0]}
-          onClick={() => { window.location = "/world" }}
+        //   onClick={() => { window.location = "/world" }}
         >
           To World
           <meshBasicMaterial color={"#494646"} />

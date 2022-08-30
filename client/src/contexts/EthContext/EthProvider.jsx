@@ -7,21 +7,22 @@ import { reducer, actions, initialState } from "./state";
 
 function EthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [isCanUse, setIsCanUse] = useState(false)
+  const [isUse, setIsCanUse] = useState(()=>{
+    const web3 = new Web3(Web3.givenProvider)
+    if(web3.givenProvider === null){
+      return false
+    }else{
+      return true
+    }
 
-  useLayoutEffect(()=>{
-      const web3 = new Web3(Web3.givenProvider)
-      console.log(web3)
-  if(web3.givenProvider !== null){
-    setIsCanUse(true)
-  }
-  },[])
+  })
 
 
   const init = useCallback(
     async artifact => {
       if (artifact) {
         const web3 = new Web3(Web3.givenProvider);
+        setIsCanUse(true)
         // if(web3 !== null){
         //   setIsCanUse(true)
         // }
@@ -32,6 +33,7 @@ function EthProvider({ children }) {
         try {
           address = artifact.networks[networkID].address;
           contract = new web3.eth.Contract(abi, address);
+          console.error(contract)
         } catch (err) {
           console.error(err);
         }
@@ -46,20 +48,20 @@ function EthProvider({ children }) {
     const tryInit = async () => {
       try {
         const artifact = require("../../contracts/TimeCapsules.json");
-        if(isCanUse){
+        if(isUse){
           init(artifact);
         }
       } catch (err) {
         console.error(err);
       }
     };
-    if(isCanUse){
+    if(isUse){
       tryInit();
     }
   }, [init]);
 
   useEffect(() => {
-    if(isCanUse){
+    if(isUse){
     const events = ["chainChanged", "accountsChanged"];
     const handleChange = () => {
       init(state.artifact);
@@ -72,17 +74,14 @@ function EthProvider({ children }) {
   }
   }, [init, state.artifact]);
 
-  const Sorry  =() => {
-    return <div>Sorry</div>
-  }
+
 
   return (
     <EthContext.Provider value={{
       state,
       dispatch
     }}>
-      {isCanUse?children:<Sorry/>}
-      {/* {children} */}
+      {children}
     </EthContext.Provider>
   );
 }
