@@ -121,7 +121,7 @@ const Home = () => {
             }>
             </Route>
             <Route exact path="/world" element={
-              <World/>
+              <Scene/>
             }>
             </Route>
           </Routes>
