@@ -1,14 +1,17 @@
 import React from "react";
 import { useRef, Suspense , useMemo} from 'react'
-import { Canvas, useFrame} from "@react-three/fiber";
+import { Canvas, useFrame , useLoader} from "@react-three/fiber";
 import { Physics, usePlane, useBox} from "@react-three/cannon";
 import Controls from "./Controls";
 import { MathUtils } from 'three'
 import * as THREE from "three"
-import { Instances, Instance, Environment , Plane} from '@react-three/drei'
+import * as Drei from "@react-three/drei"
+import { Instances, Instance, Environment , Plane, } from '@react-three/drei'
 import { EffectComposer, SSAO } from '@react-three/postprocessing'
 import niceColors from "nice-color-palettes"
 import Puttingobj from "./Puttingobj";
+import { useGLTF } from '@react-three/drei'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 const tempColor = new THREE.Color()
 const data = Array.from({ length: 1000 }, () => ({ color: niceColors[Math.floor(Math.random() * 100)][Math.floor(Math.random() * 5)], scale: 1 }))
@@ -86,29 +89,8 @@ function Bubble({ factor, speed, xFactor, yFactor, zFactor }) {
   return <Instance ref={ref} />
 }
 
-function Add(props){
-    const [ref] = useBox(() => ({
-        mass: 1,
-        position: [0, 5, 0],
-        rotation: [0.4, 0.2, 0.5],
-        ...props
-      }));
-      const color = props.color ? props.color : "hotpink";
-      return (
-        <>
-        <mesh receiveShadow castShadow ref={ref}>
-          <boxBufferGeometry args={[1,1,1]} />
-          <meshLambertMaterial attach="material" color={color} />
-        </mesh>
-        <Controls ref={ref}/>
-        </>
-      );
-}
-
-
 export const Scene = () => {
   const ref = useRef()
-//   document.addEventListener("mousedown", ref.current.clickPosition, false);
   return (
     <Canvas
     colorManagement
@@ -132,9 +114,6 @@ export const Scene = () => {
       <Physics id="physics">
         <Controls ref={ref}/>
         <Puttingobj />
-        {/* {
-            ref.current.clickPosition()
-        } */}
         <hemisphereLight intensity={0.35} position = {[0,-100,0]}/>
         <spotLight
           position={[10, -100, 10]}
@@ -147,6 +126,8 @@ export const Scene = () => {
         <Plane position={[0, -21, 0]} rotation={[-Math.PI / 2, 0, 0]} args={[1009, 1000]} receiveShadow>
                 <meshStandardMaterial color="lightgreen" side={THREE.DoubleSide} />
         </Plane>
+        
+
         <Cube geometry={[0.1, 0.1, 0.1]}/>
         <Cube position={[0, 10, -2]} color="rebeccapurple" />
         <Cube position={[0, 20, -2]} color="darkseagreen" />
