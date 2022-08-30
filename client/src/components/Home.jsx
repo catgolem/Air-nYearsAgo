@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 import World from "./World"
 import Title from "./Title";
+import Scene from "./Scene";
 import useEth from "../contexts/EthContext/useEth";
 import { Canvas } from "@react-three/fiber"
 import * as THREE from "three"
@@ -123,7 +124,7 @@ const Home = () => {
             </Route>
             <Route exact path="/world" element={              
               <EthProvider>
-                <World/>
+                <Scene/>
               </EthProvider>
             }>
             </Route>
