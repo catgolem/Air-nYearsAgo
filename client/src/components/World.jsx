@@ -12,10 +12,10 @@ const World = () => {
 
     const readText = async () => {
         const index = await contract.methods.getCapsule().call({ from: accounts[0] });
-        if(index == -1){
+        if(Number(index) === -1){
             console.log('まだタイムカプセルを作成していません')
             return
-        }else if(index == -2){
+        }else if(Number(index) === -2){
             console.log('まだタイムカプセルを開けません')
             return
         }
@@ -33,8 +33,13 @@ const World = () => {
         alert("Please enter a value to write.");
         return;
     }
-    const contractObject = await contract.methods.createCapsule(inputValue,0,1,3,selectDay(0)).send({ from: accounts[0] });
-    console.log(contractObject)
+    try{
+
+        const contractObject = await contract.methods.createCapsule(inputValue,0,1,3,selectDay(0)).send({ from: accounts[0] });
+        console.log(contractObject)
+    }catch(err){
+        console.error("既にタイムカプセルを作成しています")
+    }
     };
 
     // データ保存用の関数
@@ -48,7 +53,7 @@ const World = () => {
             timeCapsules.push(await contract.methods.positions(i).call({ from: accounts[0] }))
             if(!timeCapsules[i].is_opened){
                 opendCapsules.push(timeCapsules[i])
-                if(timeCapsules[i].user == accounts){
+                if(timeCapsules[i].user === String(accounts[0])){
                     localStorage.setItem("MyTimeCapsule!!",JSON.stringify(timeCapsules[i]))
                     console.log("OK")
                 }
@@ -65,7 +70,17 @@ const World = () => {
         var canOpenTime = new Date()
         canOpenTime.setDate( canOpenTime.getDate() + x )
         console.log(canOpenTime.getTime())
-        return Math.floor(canOpenTime.getTime()/1000)
+        return Math.floor(canOpenTime.getTime()/1000 + 60)
+    }
+
+    // 座標変換用の関数(送信時)
+    const sendPosition = (pos) => {
+        return pos * (10 ** 16)
+    }
+
+    // 座標変換用の関数(送信時)
+    const getPosition = (pos) => {
+        return pos / (10 ** 16)
     }
 
     return (
