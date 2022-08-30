@@ -7,11 +7,14 @@ import World from "./World"
 import Title from "./Title";
 import Scene from "./Scene";
 import useEth from "../contexts/EthContext/useEth";
-import { Canvas } from "@react-three/fiber"
+import { Canvas, useFrame, useLoader } from "@react-three/fiber"
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
 import * as THREE from "three"
 import * as Drei from "@react-three/drei"
 import colors from "nice-color-palettes"
 import Font from "./assets/text.typeface.json"
+import { useState, useRef } from "react";
+
 import { EthProvider } from "../contexts/EthContext";
 
 function Box() {
@@ -37,6 +40,40 @@ function Box() {
   )
 }
 
+const HandPoint = () => {
+  const ref = useRef()
+  let delta = 0.05;
+  useFrame(() => {
+    if(ref.current.position.x > -8.8 && ref.current.position.y > -4.3){
+      delta = -0.05
+    }else if(ref.current.position.x < -9.7 && ref.current.position.y < -5.4) {
+      delta = 0.05
+    }
+    ref.current.position.x += delta
+    ref.current.position.y += delta
+  })
+  const [visibilitiy, setVisibility] = useState(false)
+  const stl = useLoader(STLLoader, "handPoint.stl")
+  console.log(stl)
+  setTimeout(() => {
+    setVisibility(true)
+  },15000)
+  return (
+    <mesh
+      ref={ref}
+      scale={0.2}
+      position={[-9.5, -5, 0]}
+      rotation={[0, 0, Math.PI / 6]}
+      visible={visibilitiy}
+    >
+      <primitive
+        object={stl}
+        attach="geometry"
+      />
+      <meshStandardMaterial color={"orange"} />
+    </mesh>
+  )
+}
 
 const Home = () => {
   // const { state: { contract, accounts } } = useEth();
@@ -108,13 +145,14 @@ const Home = () => {
                   args={[10,3,2]}
                   onClick={() => {window.location = "/world"}}
                 >
-                  <meshBasicMaterial color={"#ffffff00"} visible={false}/>
+                  <meshBasicMaterial visible={false}/>
                 </Drei.Box>
                 {
                   arr.map((e, index) => {
                     return <Box key={index} />
                   })
                 }
+                <HandPoint />
                 <Drei.OrbitControls
                   maxDistance={25} 
                   minDistance={10}
