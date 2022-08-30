@@ -121,8 +121,7 @@ const Home = () => {
               </Canvas>
             }>
             </Route>
-            <Route exact path="/world" element={
-              
+            <Route exact path="/world" element={              
               <EthProvider>
                 <World/>
               </EthProvider>
