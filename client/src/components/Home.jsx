@@ -4,6 +4,8 @@ import {
   Route,
 } from "react-router-dom";
 import World from "./World"
+import Title from "./Title";
+import Scene from "./Scene";
 import useEth from "../contexts/EthContext/useEth";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber"
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
@@ -13,6 +15,7 @@ import colors from "nice-color-palettes"
 import Font from "./assets/text.typeface.json"
 import { useState, useRef } from "react";
 
+import { EthProvider } from "../contexts/EthContext";
 
 function Box() {
   const boxgeometry = new THREE.SphereGeometry(0.5)
@@ -73,15 +76,32 @@ const HandPoint = () => {
 }
 
 const Home = () => {
-  const { state: { contract, accounts } } = useEth();
+  // const { state: { contract, accounts } } = useEth();
   const arr = Array(200).fill(1)
-  const Init = async () => {
-    localStorage.setItem("adress:",accounts)
-      console.log(contract)
-      const getObj = await contract.methods.readText().call({ from: accounts[0] });
-      localStorage.setItem("TimeCapsules",JSON.stringify(getObj))
-      console.log(getObj)
-  }
+
+    //   // データ保存用の関数
+    //   const Init = async () => {
+    //     localStorage.setItem("adress",accounts[0])
+    //     const limit = await contract.methods.getPositionLength().call({ from: accounts[0] });
+    //     console.log(limit)
+    //     const timeCapsules=[];
+    //     const opendCapsules = [];
+    //     const closedCapsules = []
+    //     for(var i = 0; i < limit; i++){
+    //         timeCapsules.push(await contract.methods.positions(i).call({ from: accounts[0] }))
+    //         if(!timeCapsules[i].is_opened){
+    //             opendCapsules.push(timeCapsules[i])
+    //             if(timeCapsules[i].user === String(accounts[0]) ){
+    //                 localStorage.setItem("MyTimeCapsule!!",JSON.stringify(timeCapsules[i]))
+    //                 console.log("OK")
+    //             }
+    //         }else{
+    //             closedCapsules.push(timeCapsules)
+    //         }
+    //     }
+    //     localStorage.setItem("opendCapsules",JSON.stringify(opendCapsules))
+    //     localStorage.setItem("timeCapsules",JSON.stringify(timeCapsules))
+    // }
 
 
     return (
@@ -94,7 +114,8 @@ const Home = () => {
               >
                 <Drei.PerspectiveCamera makeDefault position={[0,0,16]}/>
                 <ambientLight />
-                <Drei.Float floatIntensity={6} speed={3}>
+                <Title/>
+                {/* <Drei.Float floatIntensity={6} speed={3}>
                   <Drei.Text3D
                     font={Font}
                     bevelEnabled
@@ -118,7 +139,7 @@ const Home = () => {
                     To World
                     <meshBasicMaterial color={"#494646"} />
                   </Drei.Text3D>
-                </Drei.Float>
+                </Drei.Float> */}
                 <Drei.Box 
                   position={[0,-3,0.5]} 
                   args={[10,3,2]}
@@ -139,8 +160,10 @@ const Home = () => {
               </Canvas>
             }>
             </Route>
-            <Route exact path="/world" element={
-              <World/>
+            <Route exact path="/world" element={              
+              <EthProvider>
+                <Scene/>
+              </EthProvider>
             }>
             </Route>
           </Routes>
