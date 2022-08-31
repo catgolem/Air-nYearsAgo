@@ -12,7 +12,6 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
 import * as THREE from "three"
 import * as Drei from "@react-three/drei"
 import colors from "nice-color-palettes"
-import Font from "./assets/text.typeface.json"
 import { useState, useRef } from "react";
 import Temp from "./Temp";
 import Web3 from "web3";
